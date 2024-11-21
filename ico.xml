@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach>
+  <!-- Metadata -->
+  <DataModel name="ICOFile">
+    <!-- ICO Header -->
+    <Block name="ICOHeader">
+      <Number name="Reserved" size="16" value="0" token="true" /> <!-- Reserved: Must be 0 -->
+      <Number name="Type" size="16" value="1" token="true" />     <!-- Type: 1 for ICO -->
+      <Number name="ImageCount" size="16" value="1" />            <!-- Number of images -->
+    </Block>
+
+    <!-- ICO Directory Entry -->
+    <Block name="ICODirectoryEntry">
+      <Number name="Width" size="8" value="32" />                 <!-- Width in pixels -->
+      <Number name="Height" size="8" value="32" />                <!-- Height in pixels -->
+      <Number name="ColorCount" size="8" value="0" />             <!-- Number of colors (0 if >=256) -->
+      <Number name="Reserved" size="8" value="0" token="true" />  <!-- Reserved: Must be 0 -->
+      <Number name="ColorPlanes" size="16" value="1" />           <!-- Color planes -->
+      <Number name="BitsPerPixel" size="16" value="24" />         <!-- Bits per pixel -->
+      <Number name="ImageSize" size="32" value="0" />             <!-- Size of the image data -->
+      <Number name="ImageOffset" size="32" value="22" />          <!-- Offset to image data -->
+    </Block>
+
+    <!-- ICO Image Data -->
+    <Block name="ICOImageData">
+      <!-- Placeholder for image data -->
+      <Blob name="ImageData" length="1024" valueType="random" />  <!-- Randomized image data -->
+    </Block>
+
+    <!-- Full ICO Structure -->
+    <Block name="FullICO">
+      <Block ref="ICOHeader" />
+      <Block ref="ICODirectoryEntry" />
+      <Block ref="ICOImageData" />
+    </Block>
+  </DataModel>
+
+  <!-- State Model -->
+  <StateModel name="StateModel" initialState="Initial">
+    <State name="Initial">
+      <Action type="output">
+        <DataModel ref="FullICO" />
+      </Action>
+    </State>
+  </StateModel>
+
+  <!-- Test -->
+  <Test name="ICOTest">
+    <StateModel ref="StateModel" />
+    <Publisher class="File">
+      <Param name="Path" value="test.ico" />
+    </Publisher>
+  </Test>
+
+  <!-- Target -->
+  <Agent name="LocalAgent">
+    <Monitor class="Process">
+      <Param name="Executable" value="/path/to/icon/handler" /> <!-- Example: a custom icon parser -->
+      <Param name="Arguments" value="test.ico" />
+    </Monitor>
+  </Agent>
+
+  <!-- Run -->
+  <Run name="ICORun">
+    <Test ref="ICOTest" />
+    <Agent ref="LocalAgent" />
+  </Run>
+</Peach>
