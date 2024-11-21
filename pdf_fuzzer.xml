@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Peach>
+  <!-- Metadata -->
+  <DataModel name="PDFFile">
+    <!-- PDF Header -->
+    <Block name="PDFHeader">
+      <String value="%PDF-" token="true" />
+      <String name="Version" value="1.7" />
+      <String value="\x0A" token="true" />
+    </Block>
+
+    <!-- Body Section -->
+    <Block name="PDFBody">
+      <String name="ObjectStart" value="1 0 obj" token="true" />
+      <String value="\x0A" token="true" />
+      <String name="Content" value="Hello World!" />
+      <String value="\x0A" token="true" />
+      <String name="ObjectEnd" value="endobj" token="true" />
+      <String value="\x0A" token="true" />
+    </Block>
+
+    <!-- Cross-Reference Table -->
+    <Block name="PDFXRef">
+      <String value="xref" token="true" />
+      <String value="\x0A" token="true" />
+      <String value="0 1" token="true" />
+      <String value="\x0A" token="true" />
+      <String value="0000000000 65535 f " />
+      <String value="\x0A" token="true" />
+    </Block>
+
+    <!-- Trailer -->
+    <Block name="PDFTrailer">
+      <String value="trailer" token="true" />
+      <String value="\x0A" token="true" />
+      <String name="Size" value="<< /Size 1 /Root 1 0 R >>" />
+      <String value="\x0A" token="true" />
+      <String value="startxref" token="true" />
+      <String value="\x0A" token="true" />
+      <String value="0" />
+      <String value="\x0A" token="true" />
+      <String value="%%EOF" token="true" />
+    </Block>
+
+    <!-- Full PDF Structure -->
+    <Block name="FullPDF">
+      <Block ref="PDFHeader" />
+      <Block ref="PDFBody" />
+      <Block ref="PDFXRef" />
+      <Block ref="PDFTrailer" />
+    </Block>
+  </DataModel>
+
+  <!-- Mutators -->
+  <StateModel name="StateModel" initialState="Initial">
+    <State name="Initial">
+      <Action type="output">
+        <DataModel ref="FullPDF" />
+      </Action>
+    </State>
+  </StateModel>
+
+  <!-- Test Configuration -->
+  <Test name="PDFTest">
+    <StateModel ref="StateModel" />
+    <Publisher class="File">
+      <Param name="Path" value="test.pdf" />
+    </Publisher>
+  </Test>
+
+  <!-- Target Configuration -->
+  <Agent name="LocalAgent">
+    <Monitor class="Process">
+      <Param name="Executable" value="/path/to/pdf/reader" />
+      <Param name="Arguments" value="test.pdf" />
+    </Monitor>
+  </Agent>
+
+  <!-- Run -->
+  <Run name="PDFRun">
+    <Test ref="PDFTest" />
+    <Agent ref="LocalAgent" />
+  </Run>
+</Peach>
